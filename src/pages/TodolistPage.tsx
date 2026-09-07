@@ -1,28 +1,62 @@
 import TaskCard from "../components/TaskCard";
 import TodoModal from "../components/Modal";
 import { type TaskCardProps } from "../libs/Todolist";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const defaultTasks: TaskCardProps[] = [];
+
+const STORAGE_KEY = "lab13.tasks";
+
+// อ่านค่าเก่าจาก localStorage (เก็บได้แค่ string จึงต้อง JSON.parse กลับเป็น array)
+function loadTasks(): TaskCardProps[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : defaultTasks;
+  } catch {
+    return defaultTasks; // เผื่อข้อมูลใน localStorage เสีย
+  }
+}
 
 function App() {
-  const [tasks, setTasks] = useState<TaskCardProps[]>([]);
+  const [tasks, setTasks] = useState<TaskCardProps[]>(loadTasks);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  }, [tasks]);
 
   const handleAdd = (newTask: TaskCardProps) => {
-    console.log("TODO handleAdd", newTask);
+    setTasks([...tasks, newTask]);
+    // console.log("TODO handleAdd", newTask);
   };
 
   const deleteTask = (taskId: string) => {
-    console.log("TODO deleteTask", taskId);
+    setTasks(tasks.filter((t) => t.id !== taskId));
+    // console.log("TODO deleteTask", taskId);
   };
 
   const toggleDoneTask = (taskId: string) => {
-    console.log("TODO toggleDoneTask", taskId);
+    setTasks(
+      tasks.map((t) => (t.id == taskId ? { ...t, isDone: !t.isDone } : t)),
+    );
+    // console.log("TODO toggleDoneTask", taskId);
   };
 
   return (
     <div className="col-12 m-2 p-0">
       <div className="container text-center">
         <h2>Todo List</h2>
-        <span className="m-2">All : () Done : ()</span>
+        <div className="container text-center px-4">
+          <div className="row gx-3 px-3 rounded bg-warning bg-opacity-25">
+            <div className="col">
+              <div className="p-2 text-primary">All : {tasks.length}</div>
+            </div>
+            <div className="col">
+              <div className="text-success p-2">
+                Done : {tasks.filter((t) => t.isDone == true).length}
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div>
           <button

@@ -10,7 +10,20 @@ export default function Modal({ onAdd }: props) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    if (title.trim()) {
+      const newtodo: TaskCardProps = {
+        id: uuidv4(),
+        title,
+        description,
+        isDone: false,
+      };
+      onAdd(newtodo);
+      // STEP 9 — reset ฟอร์มด้วยการ set state กลับเป็นค่าว่าง
+      setTitle("");
+      setDescription("");
+    }
+  };
 
   const titleOnchange = (event: any) => {
     setTitle(event.target.value);
@@ -60,7 +73,7 @@ export default function Modal({ onAdd }: props) {
             <button
               type="button"
               className="btn btn-success"
-              onClick={() => {}}
+              onClick={handleSubmit}
             >
               Save
             </button>
